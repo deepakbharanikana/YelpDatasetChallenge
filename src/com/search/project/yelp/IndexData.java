@@ -16,7 +16,6 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
@@ -27,6 +26,9 @@ import org.apache.lucene.store.FSDirectory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.search.project.yelp.datatypes.Business;
+import com.search.project.yelp.datatypes.Review;
+import com.search.project.yelp.datatypes.Tip;
 
 public class IndexData {
 

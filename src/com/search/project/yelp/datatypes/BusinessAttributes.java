@@ -1,4 +1,4 @@
-package com.search.project.yelp;
+package com.search.project.yelp.datatypes;
 
 import com.google.gson.JsonObject;
 

@@ -9,7 +9,7 @@
  *
  */
 
-package com.search.project.yelp;
+package com.search.project.yelp.datatypes;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
