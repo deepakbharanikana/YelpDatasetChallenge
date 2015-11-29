@@ -109,6 +109,13 @@ public class Review {
 				+ ", business_id=" + business_id + "]";
 	}
 
+	public static Review jsonStringToReview(String json) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+		String jsonreview = json;
+		Review review = gson.fromJson(jsonreview, Review.class);
+		return review;
+	}
+
 	public static void readGson() {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 

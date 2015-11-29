@@ -71,6 +71,13 @@ public class Tip {
 				+ ", type=" + type + "]";
 	}
 
+	public static Tip jsonStringToTip(String json) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+		String jsontip = json;
+		Tip tip = gson.fromJson(jsontip, Tip.class);
+		return tip;
+	}
+
 	public static void readGson() {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		String jsontip = "{\"user_id\": \"EZ0r9dKKtEGVx2CdnowPCw\", \"text\": \"Your GPS will not allow you to find this place. Put Rankin police department in instead. They are directly across the street.\", \"business_id\": \"mVHrayjG3uZ_RLHkLj-AMg\", \"likes\": 0, \"date\": \"2013-01-06\", \"type\": \"tip\"}";

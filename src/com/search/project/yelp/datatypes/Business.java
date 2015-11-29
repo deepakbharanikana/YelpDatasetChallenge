@@ -212,6 +212,13 @@ public class Business {
 		}
 	}
 
+	public static Business jsonStringToBusiness(String json) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+		String jsonbusiness = json;
+		Business business = gson.fromJson(jsonbusiness, Business.class);
+		return business;
+	}
+
 	public static void readGson() {
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 		String jsonbusiness = "{\"business_id\": \"mVHrayjG3uZ_RLHkLj-AMg\", \"full_address\": \"414 Hawkins Ave\nBraddock, PA 15104\", \"hours\": {\"Tuesday\": {\"close\": \"19:00\", \"open\": \"10:00\"}, \"Friday\": {\"close\": \"20:00\", \"open\": \"10:00\"}, \"Saturday\": {\"close\": \"16:00\", \"open\": \"10:00\"}, \"Thursday\": {\"close\": \"19:00\", \"open\": \"10:00\"}, \"Wednesday\": {\"close\": \"19:00\", \"open\": \"10:00\"}}, \"open\": true, \"categories\": [\"Bars\", \"American (New)\", \"Nightlife\", \"Lounges\", \"Restaurants\"], \"city\": \"Braddock\", \"review_count\": 11, \"name\": \"Emil's Lounge\", \"neighborhoods\": [], \"longitude\": -79.866350699999998, \"state\": \"PA\", \"stars\": 4.5, \"latitude\": 40.408735, \"attributes\": {\"Alcohol\": \"full_bar\", \"Noise Level\": \"average\", \"Has TV\": true, \"Attire\": \"casual\", \"Ambience\": {\"romantic\": false, \"intimate\": false, \"classy\": false, \"hipster\": false, \"divey\": false, \"touristy\": false, \"trendy\": false, \"upscale\": false, \"casual\": false}, \"Good for Kids\": true, \"Price Range\": 1, \"Good For Dancing\": false, \"Delivery\": false, \"Coat Check\": false, \"Smoking\": \"no\", \"Accepts Credit Cards\": true, \"Take-out\": true, \"Happy Hour\": false, \"Outdoor Seating\": false, \"Takes Reservations\": false, \"Waiter Service\": true, \"Wi-Fi\": \"no\", \"Caters\": true, \"Good For\": {\"dessert\": false, \"latenight\": false, \"lunch\": false, \"dinner\": false, \"breakfast\": false, \"brunch\": false}, \"Parking\": {\"garage\": false, \"street\": false, \"validated\": false, \"lot\": false, \"valet\": false}, \"Music\": {\"dj\": false}, \"Good For Groups\": true}, \"type\": \"business\"}";

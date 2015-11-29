@@ -16,6 +16,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
@@ -80,6 +81,7 @@ public class IndexData {
 			Directory dir = FSDirectory.open(Paths.get(indexPath + "\\"
 					+ object));
 			Analyzer analyzer = new StandardAnalyzer();
+			//try using whitespaceanalyzer here to avoid - being replaced by whitespace
 			IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
 			iwc.setOpenMode(OpenMode.CREATE);
@@ -144,7 +146,7 @@ public class IndexData {
 			String lineInFile) {
 		review = gson.fromJson(lineInFile, Review.class);
 		System.out.println("Indexing document: " + review.getReview_id());
-		ldoc.add(new TextField("USERID", review.getUser_id(), Field.Store.YES));
+		ldoc.add(new StringField("USERID", review.getUser_id(), Field.Store.YES));
 		ldoc.add(new TextField("REVIEWID", review.getReview_id(),
 				Field.Store.YES));
 		ldoc.add(new DoubleField("STARS", review.getStars(), Field.Store.YES));
@@ -152,7 +154,7 @@ public class IndexData {
 				Field.Store.YES));
 		ldoc.add(new TextField("TEXT", review.getText(), Field.Store.YES));
 		ldoc.add(new TextField("TYPE", review.getType(), Field.Store.YES));
-		ldoc.add(new TextField("BUSINESSID", review.getBusiness_id(),
+		ldoc.add(new StringField("BUSINESSID", review.getBusiness_id(),
 				Field.Store.YES));
 
 	}
@@ -176,7 +178,7 @@ public class IndexData {
 			Document ldoc, String lineInFile) {
 		business = gson.fromJson(lineInFile, Business.class);
 		System.out.println("Indexing document: " + business.getBusiness_id());
-		ldoc.add(new TextField("BUSINESSID", business.getBusiness_id(),
+		ldoc.add(new StringField("BUSINESSID", business.getBusiness_id(),
 				Field.Store.YES));
 		ldoc.add(new TextField("FULL_ADDRESS", business.getFull_address(),
 				Field.Store.YES));
@@ -223,7 +225,7 @@ public class IndexData {
 		IndexData ed = new IndexData();
 		ed.setIndexPath("C:\\searchproject\\yelp\\index");
 		ed.setCorpusPath("/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset");
-		// ed.generateIndex("review");
+		ed.generateIndex("review");
 		ed.generateIndex("business");
 		// ed.generateIndex("tip");
 
