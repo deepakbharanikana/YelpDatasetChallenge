@@ -9,7 +9,6 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
-import com.search.project.yelp.datatypes.Business;
 
 public class MongoDBHelloWorld {
 
