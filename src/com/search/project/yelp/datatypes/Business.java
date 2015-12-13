@@ -7,9 +7,11 @@
  * data structure to convert the json object of business into Java object
  * for handling the yelp dataset problems related to business.json file.
  *
+ * November 26, 2015
+ *
  */
 
-package com.search.project.yelp.datatypes;
+package com.search.project.yelp.task1.datatypes;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,6 +29,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import com.search.project.yelp.task1.UtilFunctions;
 
 public class Business {
 	private String business_id;
@@ -189,7 +192,6 @@ public class Business {
 				attributesString[0] = attributesString[0].replace(str, "");
 			}
 		}
-		// System.out.println(attributesString[0]);
 		String[] attributes = attributesString[0].split(",");
 		for (String attrib : attributes) {
 			attrib = attrib.split(":")[0];
@@ -198,16 +200,6 @@ public class Business {
 			if (!attributeList.contains(attrib)) {
 				attributeList.add(attrib);
 				System.out.println(attrib);
-				// if (innerClasses != null && innerClasses.length > 0) {
-				// innerClasses = innerClasses[0].split(",");
-				// for (String inner : innerClasses) {
-				// inner = inner.split(":")[0];
-				// inner = inner.replace("\"", "");
-				// inner = inner.trim();
-				// System.out.println("\t" + inner);
-				// }
-				// }
-				// innerClasses = null;
 			}
 		}
 	}
@@ -225,17 +217,11 @@ public class Business {
 		BufferedReader br;
 		ArrayList<String> attributeList = new ArrayList<String>();
 
-		Type type = new TypeToken<Map<String, String>>() {
-		}.getType();
-		Map<String, String> myMap = gson.fromJson(
-				"{'k1':'apple','k2':'orange'}", type);
-		System.out.println(myMap);
-
 		try {
 			br = new BufferedReader(
 					new FileReader(
-							"F:/Users/Milind/Documents/GitHub/Z534_Search/src/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset/yelp_academic_dataset_business.json"));
-			// C:/Users/mgokhale/Documents/GitHub/Z534_Search/src/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset/yelp_academic_dataset_business.json
+							UtilFunctions.getMySourcePath()
+									+ "/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset/yelp_academic_dataset_business.json"));
 			Business business = gson.fromJson(jsonbusiness, Business.class);
 			System.out.println(business);
 
@@ -256,7 +242,6 @@ public class Business {
 			while ((thisline = br.readLine()) != null) {
 				i++;
 				business = gson.fromJson(thisline, Business.class);
-				// System.out.println(business);
 				business.findAllAttributes(thisline, attributeList);
 			}
 			System.out.println("Analyzed " + i + " business rows");
@@ -264,7 +249,6 @@ public class Business {
 			System.out.println("Arributes List: " + attributeList);
 			br.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 
@@ -280,8 +264,9 @@ public class Business {
 		try {
 			br = new BufferedReader(
 					new FileReader(
-					// "F:/Users/Milind/Documents/GitHub/Z534_Search/src/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset/yelp_academic_dataset_business.json"
-							"C:/Users/mgokhale/Documents/GitHub/Z534_Search/src/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset/yelp_academic_dataset_business.json"));
+							UtilFunctions.getMySourcePath() +
+							// "F:/Users/Milind/Documents/GitHub/Z534_Search/src/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset/yelp_academic_dataset_business.json"));
+									"/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset/yelp_academic_dataset_business.json"));
 			String thisline = "";
 			int i = 0;
 			Business business;
@@ -307,7 +292,10 @@ public class Business {
 		// Business.readGson();
 		HashSet<String> catList = Business.getCategoriesList();
 		System.out.println("Found " + catList.size() + " categories");
-		System.out.println(catList);
+		for (String string : catList) {
+			System.out.println(string);
+		}
+		// System.out.println(catList);
 
 	}
 }

@@ -1,4 +1,16 @@
-package com.search.project.yelp.datatypes;
+/************************************************************************
+ * File: Business.java
+ * Author: Milind Gokhale (mgokhale@indiana.edu)
+ *
+ * An implementation of Tip data structure for handling Tip 
+ * entries of yelp dataset.
+ * This class will help automatic mapping tip from the tip.json file in yelp dataset.
+ *
+ * November 26, 2015
+ *
+ */
+
+package com.search.project.yelp.task1.datatypes;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

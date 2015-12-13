@@ -1,4 +1,16 @@
-package com.search.project.yelp.datatypes;
+/************************************************************************
+ * File: Business.java
+ * Author: Milind Gokhale (mgokhale@indiana.edu)
+ *
+ * An implementation of Review data structures votes for handling Review 
+ * entries of yelp dataset.
+ * This class will help automatic mapping votes for review from the review.json file in yelp dataset.
+ *
+ * November 26, 2015
+ *
+ */
+
+package com.search.project.yelp.task1.datatypes;
 
 public class Votes {
 	public int funny;

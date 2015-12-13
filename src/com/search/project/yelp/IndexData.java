@@ -1,12 +1,35 @@
-package com.search.project.yelp;
+/**
+ * @author Milind Gokhale
+ * This code primarily extracts data from the training and test sets and prepares index for each dataset.
+ * The index prepared is a lucene index. Lucene index fields used in the final approach
+ * [BUSINESSID, CATEGORIES, REVIEWSTIPS]
+ * 
+ * This class also contains code for extracting data json file and prepare index for business, review and tip json files for approach without using mongodb.
+ * The index structure used in earlier approach was same as the json structure of each business, review and tip 
+ * However it took more time to extract category features using this approach hence finally mongodb was used for data storage. 
+ * 
+ * This class also contains code to apply POS tagging and prepare the bag of words for each category.
+ * 
+ * TrainingSet and TestSet table structure
+ * [BusinessID, Categories, Reviews, Tips]
+ * 
+ * Date : November 17, 2015
+ */
+
+package com.search.project.yelp.task1;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -27,22 +50,39 @@ import org.apache.lucene.store.FSDirectory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import com.search.project.yelp.datatypes.Business;
 import com.search.project.yelp.datatypes.Review;
 import com.search.project.yelp.datatypes.Tip;
 
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.ling.TaggedWord;
+import edu.stanford.nlp.process.CoreLabelTokenFactory;
+import edu.stanford.nlp.process.DocumentPreprocessor;
+import edu.stanford.nlp.process.PTBTokenizer;
+import edu.stanford.nlp.process.TokenizerFactory;
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
+/**
+ * @author Milind
+ * @info Class to index data
+ */
 public class IndexData {
 
 	private String indexPath;
 	private String corpusPath;
 	private String sourcePath;
+	MaxentTagger tagger = new MaxentTagger(
+			"H:/Users/Milind/Downloads/stanford-postagger-2015-04-20/stanford-postagger-2015-04-20/models/english-left3words-distsim.tagger");
+	TokenizerFactory<CoreLabel> ptbTokenizerFactory = PTBTokenizer.factory(
+			new CoreLabelTokenFactory(), "untokenizable=noneKeep");
 
 	public IndexData() {
-		URL location = Review.class.getProtectionDomain().getCodeSource()
-				.getLocation();
-		String srcPath = location.toString().replace("file:/", "")
-				.replace("bin", "src");
-		setSourcePath(srcPath);
+		setSourcePath(UtilFunctions.getMySourcePath());
 	}
 
 	public String getIndexPath() {
@@ -69,6 +109,159 @@ public class IndexData {
 		this.sourcePath = sourcePath;
 	}
 
+	/**
+	 * This function generates index of training and test set. Input tableName
+	 * takes the name of training or test set collection in mongodb.
+	 * 
+	 * @param tableName
+	 */
+	private void generateMongoTableIndex(String tableName) {
+		MongoClient mongoClient = new MongoClient("localhost", 27017);
+		MongoDatabase db = mongoClient.getDatabase("yelp");
+		MongoCollection<org.bson.Document> table = db.getCollection(tableName);
+		MongoCursor<org.bson.Document> cursor = table.find().iterator();
+
+		Directory dir;
+		try {
+			dir = FSDirectory.open(Paths.get(indexPath + "\\" + tableName));
+			Analyzer analyzer = new StandardAnalyzer();
+			IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+			iwc.setOpenMode(OpenMode.CREATE);
+			IndexWriter writer;
+			writer = new IndexWriter(dir, iwc);
+
+			while (cursor.hasNext()) {
+				// Create a lucene document and add to lucene index
+				org.bson.Document businessDoc = cursor.next();
+				Document ldoc = new Document();
+
+				String businessID = (String) businessDoc.get("business_id");
+				ldoc.add(new StringField("BUSINESSID", businessID,
+						Field.Store.YES));
+				ArrayList<String> categories = (ArrayList<String>) businessDoc
+						.get("categories");
+				for (String str : categories) {
+					ldoc.add(new StringField("CATEGORIES", str, Field.Store.YES));
+				}
+				ArrayList<String> reviews = (ArrayList<String>) businessDoc
+						.get("reviews");
+				if (reviews != null) {
+					for (String str : reviews) {
+						ldoc.add(new TextField("REVIEWSTIPS", str,
+								Field.Store.YES));
+					}
+				}
+				ArrayList<String> tips = (ArrayList<String>) businessDoc
+						.get("tips");
+				for (String str : tips) {
+					ldoc.add(new TextField("REVIEWSTIPS", str, Field.Store.YES));
+				}
+
+				writer.addDocument(ldoc);
+			}
+
+			writer.forceMerge(1);
+			writer.commit();
+			writer.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		mongoClient.close();
+	}
+
+	/**
+	 * This function POS tags the words in the category features and extracts
+	 * nouns from them. It puts the new bag of words in the categoryFeatureMap
+	 * and returns the map.
+	 * 
+	 * @param categoryFeatures
+	 * @return categoryFeatuesMap
+	 * @throws IOException
+	 */
+	public HashMap<String, String> posTagCategoryFeatures(
+			HashMap<String, String> categoryFeatures) throws IOException {
+
+		HashMap<String, String> categoryFeaturesMap = new HashMap<String, String>();
+
+		for (Entry<String, String> categoryFeatureEntry : categoryFeatures
+				.entrySet()) {
+			String categoryFeatureValue = "";
+			String category = categoryFeatureEntry.getKey();
+			String categoryValue = categoryFeatureEntry.getValue();
+
+			FileWriter fw = new FileWriter(
+					"H:/Users/Milind/Downloads/stanford-postagger-2015-04-20/stanford-postagger-2015-04-20/categoryFeatureWordsFile.txt");
+			fw.write(categoryValue);
+			fw.close();
+			PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out,
+					"utf-8"));
+			DocumentPreprocessor documentPreprocessor = new DocumentPreprocessor(
+					"H:/Users/Milind/Downloads/stanford-postagger-2015-04-20/stanford-postagger-2015-04-20/categoryFeatureWordsFile.txt");
+			documentPreprocessor.setTokenizerFactory(ptbTokenizerFactory);
+			for (List<HasWord> sentence : documentPreprocessor) {
+				List<TaggedWord> tSentence = tagger.tagSentence(sentence);
+				for (TaggedWord tw : tSentence) {
+					if (tw.tag().startsWith("NN") && tw.word().length() > 3) {
+						categoryFeatureValue += tw.word() + " ";
+					}
+				}
+			}
+			categoryFeaturesMap.put(category, categoryFeatureValue);
+			pw.println("category: " + category + " processed");
+		}
+		// pw.close();
+
+		return categoryFeaturesMap;
+	}
+
+	/**
+	 * Take the category features map and generate 
+	 * 
+	 * @param categoryFeaturesMap
+	 */
+	private void generateCategoriesIndex(
+			HashMap<String, String> categoryFeaturesMap) {
+		Directory dir;
+		try {
+			dir = FSDirectory.open(Paths.get(indexPath + "\\"
+					+ "categoriesAndBagOfWords"));
+			Analyzer analyzer = new StandardAnalyzer();
+			IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+			iwc.setOpenMode(OpenMode.CREATE);
+			IndexWriter writer;
+			writer = new IndexWriter(dir, iwc);
+
+			for (Entry<String, String> categoryEntry : categoryFeaturesMap
+					.entrySet()) {
+				// Form lucene document and add to index
+				Document ldoc = new Document();
+
+				ldoc.add(new StringField("CATEGORY", categoryEntry.getKey(),
+						Field.Store.YES));
+				ldoc.add(new TextField("BAGOFWORDS", categoryEntry.getValue(),
+						Field.Store.YES));
+
+				writer.addDocument(ldoc);
+			}
+			writer.forceMerge(1);
+			writer.commit();
+			writer.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Earlier approach to index business, review and tip json files and then
+	 * use it to generate category features.
+	 * 
+	 * @param object
+	 */
 	public void generateIndex(String object) {
 		FileWriter fileWriter;
 		try {
@@ -81,11 +274,8 @@ public class IndexData {
 			Directory dir = FSDirectory.open(Paths.get(indexPath + "\\"
 					+ object));
 			Analyzer analyzer = new StandardAnalyzer();
-			//try using whitespaceanalyzer here to avoid - being replaced by whitespace
 			IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-
 			iwc.setOpenMode(OpenMode.CREATE);
-
 			IndexWriter writer;
 			writer = new IndexWriter(dir, iwc);
 
@@ -142,6 +332,16 @@ public class IndexData {
 
 	}
 
+	/**
+	 * 
+	 * prepare entry of lucene document to insert in the lucene index for
+	 * reviews
+	 * 
+	 * @param gson
+	 * @param review
+	 * @param ldoc
+	 * @param lineInFile
+	 */
 	public void prepareAndIndexReview(Gson gson, Review review, Document ldoc,
 			String lineInFile) {
 		review = gson.fromJson(lineInFile, Review.class);
@@ -159,6 +359,15 @@ public class IndexData {
 
 	}
 
+	/**
+	 * 
+	 * prepare entry of lucene document to insert in the lucene index for tips
+	 * 
+	 * @param gson
+	 * @param tip
+	 * @param ldoc
+	 * @param lineInFile
+	 */
 	public void prepareAndIndexTip(Gson gson, Tip tip, Document ldoc,
 			String lineInFile) {
 		tip = gson.fromJson(lineInFile, Tip.class);
@@ -174,6 +383,16 @@ public class IndexData {
 
 	}
 
+	/**
+	 * 
+	 * prepare entry of lucene document to insert in the lucene index for
+	 * businesses
+	 * 
+	 * @param gson
+	 * @param business
+	 * @param ldoc
+	 * @param lineInFile
+	 */
 	public void prepareAndIndexBusiness(Gson gson, Business business,
 			Document ldoc, String lineInFile) {
 		business = gson.fromJson(lineInFile, Business.class);
@@ -192,12 +411,9 @@ public class IndexData {
 		ldoc.add(new Field("HOURS", business.getHours().toString(), HoursField));
 		ldoc.add(new IntField("OPEN", (business.isOpen() == true ? 1 : 0),
 				Field.Store.YES));
-		// DID NOT INDEX CATEGORIES IN THIS YET
-		String categories = "";
 		for (String str : business.getCategories()) {
-			categories += str + ", ";
+			ldoc.add(new StringField("CATEGORIES", str, Field.Store.YES));
 		}
-		ldoc.add(new TextField("CATEGORIES", categories, Field.Store.YES));
 		ldoc.add(new TextField("CITY", business.getCity(), Field.Store.YES));
 		ldoc.add(new IntField("REVIEW_COUNT", business.getReview_count(),
 				Field.Store.YES));
@@ -222,12 +438,34 @@ public class IndexData {
 	}
 
 	public static void main(String[] args) {
-		IndexData ed = new IndexData();
-		ed.setIndexPath("C:\\searchproject\\yelp\\index");
-		ed.setCorpusPath("/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset");
-		ed.generateIndex("review");
-		ed.generateIndex("business");
-		// ed.generateIndex("tip");
+		IndexData idata = new IndexData();
+		idata.setIndexPath("C:\\searchproject\\yelp\\index");
+		idata.setCorpusPath("/com/search/project/yelp/dataset/yelp_dataset_challenge_academic_dataset");
+
+		// ////////////////// Earlier approach which took more time to extract
+		// category features
+		idata.generateIndex("review");
+		idata.generateIndex("business");
+		idata.generateIndex("tip");
+		idata.generateCategoriesIndex(UtilFunctions.getCategoryFeaturesMap());
+
+		// //////////////////
+		// Final approach in which large data was put in mongodb and helped
+		// faster category features extraction.
+		idata.generateMongoTableIndex("New_training_set");
+		idata.generateMongoTableIndex("New_test_set");
+		HashMap<String, String> categoryFeaturesMap = UtilFunctions
+				.getCategoryFeaturesMap();
+
+		// //////////////////
+		// Do POS tagging and get the nouns here and then pass it.
+		HashMap<String, String> categoryFeatures = null;
+		try {
+			categoryFeatures = idata.posTagCategoryFeatures(UtilFunctions
+					.getCategoryFeaturesMap());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
