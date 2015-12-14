@@ -2,11 +2,11 @@
 Z534 Search Project on Yelp Dataset
 
 ##Contributors: 
-Milind Gokhale
-Siddharth Jayasankar
-Sameedha Bairagi
-Namrata Jagasia
-Deepak Bharanikana
+Milind Gokhale | 
+Siddharth Jayasankar | 
+Sameedha Bairagi | 
+Namrata Jagasia | 
+Deepak Bharanikana | 
 
 ##Task -1: Predicting the category for each business
 Yelp has provided around 61K business and each business has one or more categories associated with it. In this task we try to predict the categories of each business from the user reviews and tips provided for these businesses.
