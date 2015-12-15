@@ -1,0 +1,45 @@
+{
+	"features": [{
+		"feature_name": "alcohol",
+		"searchQuery": "bottled bottles tap liquor drinker brewed sodas pitchers alcoholic iced beverages domestic wines vodka drafts draft soda refills beers coke"
+	}, {
+		"feature_name": "service",
+		"searchQuery": "prompt impeccable atmosphere courteous staff servicethis attentive efficient knowledgeable helpful friendly servicegreat knowledgable servicei speedy servicethe ambience welcoming consistently customer"
+	}, {
+		"feature_name": "music",
+		"searchQuery": "playing band videos dj background tunes games guitar lighting jazz loud acoustic bands lively piano ceilings relaxing songs tv furniture"
+	}, {
+		"feature_name": "reservation",
+		"searchQuery": "reservations seated advance reserved saturday booked greeted private parties monday pm arrival friday text wednesday busy tuesday ahead party acknowledge"
+	}, {
+		"feature_name": "delivery",
+		"searchQuery": "thru pickup mins johns minutes online phone card min pick-up dominos minimum waited take-out drive-thru messed text jimmy placing driver"
+	}, {
+		"feature_name": "ambience",
+		"searchQuery": "ambiance decor atmosphere vibe environment inviting lighting relaxed modern d�cor indoor relaxing layout cozy decorated interior comfortable design spacious outdoor"
+	}, {
+		"feature_name": "smoking",
+		"searchQuery": "misters fireplace seating heaters outdoor shade facing indoor bench shaded weather couches patio lamps entrance trees lounge lamp pong stage"
+	}, {
+		"feature_name": "drive-thru",
+		"searchQuery": "thru window moves register drive pick-up line pickup lines subway assembly door cars enter counter minute lane doors parked harbor"
+	}, {
+		"feature_name": "desserts",
+		"searchQuery": "deserts cookies cupcakes pastas goods breads pastries pies teas muffins tiramisu shakes items brulee varieties kinds samples soups paninis salads"
+	}, {
+		"feature_name": "discounts",
+		"searchQuery": "drafts reverse deals pitchers -pm domestic tuesdays mondays m-f wednesdays tap sundays draft beers coupons pints discounted discount saturdays craft"
+	}, {
+		"feature_name": "credit",
+		"searchQuery": "card debit cards gift receipt cash certificate fee accept refund gratuity phone tab apologized apologize checks discount payment comp coupon"
+	}, {
+		"feature_name": "romantic",
+		"searchQuery": "intimate relaxing comfortable quiet spacious cozy relaxed dimly chill comfy casual elegant inviting stylish setting quaint indoor lighting lively contemporary"
+	}, {
+		"feature_name": "affordable",
+		"searchQuery": "inexpensive reasonable priced reasonably prices portions pricing decently foodgreat courteous filling deals servicegreat efficient creative friendly welcoming prompt healthy knowledgeable"
+	}, {
+		"feature_name": "expensive",
+		"searchQuery": "pricey steep pricy pricier overpriced priced higher bucks price average reasonable pricing cheaper tad than prices expected cheap cost $-"
+	}]
+}
